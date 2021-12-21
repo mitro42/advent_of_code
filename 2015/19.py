@@ -3,7 +3,6 @@ import read_input
 
 def parse_input():
     lines = read_input.strings(sep=' ')
-    # subs = defaultdict(list)
     subs = []
     subs_done = False
     for l in lines:
@@ -11,7 +10,6 @@ def parse_input():
             subs_done = True
             continue
         if not subs_done:
-            # subs[l[0]].append(l[2])
             subs.append((l[0], l[2]))
         else:
             molecule = l[0]
@@ -36,29 +34,29 @@ def solve1(subs, molecule) -> None:
     print(len(results))
 
 
-# def solve2(subs, target) -> None:
-#     molecules = set([target])
-#     closed = set()
+def solve2(subs, target) -> None:
+    max_sub_len = max([len(rule[1]) for rule in subs])
+    reductions = {v: k for k, v in subs}
 
-#     step = 0
-#     from_e = set([m for (x, m) in subs if x == 'e'])
-#     subs = [(x, m) for (x, m) in subs if x != 'e']
-#     while len(from_e & molecules) == 0:
-#         new_closed = set()
-#         new_molecules = set()
-#         for old in molecules - closed:
-#             for s in subs:
-#                 new_molecules |= create_new_molecules((s[1], s[0]), old)
-#             new_closed.add(old)
-#         closed |= new_closed
-#         molecules |= new_molecules
-#         print(f'molecules: {len(molecules)}, closed: {len(closed)}')
+    count = 0
+    while target != 'e':
+        for i in range(len(target), 0, -1):
+            for l in range(1, max_sub_len + 1):
+                rhs = target[i - l:i]
+                if rhs in reductions:
+                    count += 1
+                    target = reductions[rhs].join(target.rsplit(rhs, 1))
+                    # print(f'{count}: {rhs} => {reductions[rhs]}')
+                    # print(target)
+                    break
+            else:
+                continue
+            break
+    print(count)
 
-#         step += 1
-#     print(step + 1)
 
 if __name__ == '__main__':
     input = parse_input()
     # print(input)
     solve1(*input)
-    # solve2(*input)
+    solve2(*input)
